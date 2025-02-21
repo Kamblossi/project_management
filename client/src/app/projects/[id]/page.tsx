@@ -6,13 +6,13 @@ import BoardView from "../BoardView";
 import List from "../ListView";
 import Timeline from "../Timeline";
 import Table from "../TableView";
+import ModalNewTask from "@/components/ModalNewTask"
 import { useParams } from "next/navigation";
 
 const Project = () => {
   const params = useParams(); // ✅ Use Next.js 14+ method to get params
   const [id, setId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Board");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
   // ✅ Wait for `params.id` before setting state
@@ -27,7 +27,11 @@ const Project = () => {
 
   return (
     <div>
-      {/* MODAL NEW TASK */}
+      <ModalNewTask
+        isOpen={isModalNewTaskOpen}
+        onClose={() => setIsModalNewTaskOpen(false)}
+        id={id}
+      />
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === "Board" && (
         <BoardView id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
