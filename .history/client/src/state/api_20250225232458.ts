@@ -137,5 +137,5 @@ export const {
   useUpdateTaskStatusMutation,
   useSearchQuery,
   useGetTeamsQuery,
-  useGetUsersQuery,
+  
 } = api;
