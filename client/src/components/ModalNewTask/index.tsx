@@ -13,8 +13,8 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<Status>(Status.ToDo);
-  const [priority, setPriority] = useState<Priority>(Priority.Backlog);
+  const [status, setStatus] = useState<Status>(Status.ToDo); // Default to "To Do"
+  const [priority, setPriority] = useState<Priority>(Priority.Medium); // Default to "Medium"
   const [tags, setTags] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -47,7 +47,26 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   };
 
   const isFormValid = () => {
-    return title && authorUserId && !(id !== null || projectId);
+    const isValid =
+      title.trim() &&
+      description.trim() &&
+      status &&
+      priority &&
+      authorUserId.trim() &&
+      (id !== null || projectId.trim());
+
+    console.log("Form Validation:", {
+      title: title.trim(),
+      description: description.trim(),
+      status,
+      priority,
+      authorUserId: authorUserId.trim(),
+      id,
+      projectId: projectId.trim(),
+      isValid,
+    });
+
+    return isValid;
   };
 
   const selectStyles =
