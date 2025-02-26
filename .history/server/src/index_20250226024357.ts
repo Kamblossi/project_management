@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
-app.use("/search", searchRoutes);
+app.use("/api/search", searchRoutes);
 app.use("/users", userRoutes);
 app.use("/teams", teamRoutes);
 

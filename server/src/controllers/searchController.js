@@ -14,6 +14,7 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const search = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query } = req.query;
+    console.log("Search Query:", query); // Debugging
     try {
         const tasks = yield prisma.task.findMany({
             where: {
@@ -36,12 +37,12 @@ const search = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 OR: [{ username: { contains: query } }],
             },
         });
+        console.log("Search Results:", { tasks, projects, users }); // Debugging
         res.json({ tasks, projects, users });
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ message: `Error performing search: ${error.message}` });
+        console.error("Error performing search:", error); // Log error to backend
+        res.status(500).json({ message: `Error performing search: ${error.message}` });
     }
 });
 exports.search = search;
