@@ -2,6 +2,7 @@
 
 import {
   Priority,
+  Project,
   Task,
   useGetProjectsQuery,
   useGetTasksQuery,
@@ -39,20 +40,20 @@ const HomePage = () => {
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [fadeIn, setFadeIn] = useState(false); // ✅ Add fade-in state
 
+  // ✅ Auto-switch projects every 10 seconds with fade-in effect
   useEffect(() => {
     if (!projects || projects.length === 0) return;
-  
+
     const interval = setInterval(() => {
-      setFadeIn(false); // Gradually remove fade-in effect
+      setFadeIn(false); // Remove fade-in before switching
       setTimeout(() => {
         setCurrentProjectIndex((prevIndex) => (prevIndex + 1) % projects.length);
-        setTimeout(() => setFadeIn(true), 300); // Delay fade-in slightly
-      }, 300); // Delay before switching projects
+        setFadeIn(true); // Reapply fade-in after switching
+      }, 100); // Small delay before switching
     }, 10000); // Change project every 10 seconds
-  
-    return () => clearInterval(interval);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [projects]);
-  
 
   const currentProject = projects?.[currentProjectIndex];
   const currentProjectId = currentProject?.id || 1; // Default to 1 if no projects
@@ -60,7 +61,7 @@ const HomePage = () => {
   const { data: tasks, isLoading: tasksLoading, isError: tasksError } =
     useGetTasksQuery({ projectId: currentProjectId });
 
-  const isDarkMode: boolean = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -84,9 +85,7 @@ const HomePage = () => {
   const taskStatusCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
       const { status } = task;
-      if (status) {
-        acc[status] = (acc[status] || 0) + 1;
-      }
+      acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
     {}

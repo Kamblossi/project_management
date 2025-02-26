@@ -66,18 +66,3 @@ body,
 
 /* DASHBOARD STYLING */
 /* Fade-in effect for project transitions */
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 1.5s ease-in-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98); /* Slight shrink effect for better transition */
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}

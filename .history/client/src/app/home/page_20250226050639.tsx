@@ -25,11 +25,21 @@ import {
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 
+// Function to format dates to YYYY-MM-DD
+const formatDate = (dateString?: string) => {
+  return dateString ? new Date(dateString).toISOString().split("T")[0] : "No Due Date";
+};
+
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
   { field: "status", headerName: "Status", width: 150 },
   { field: "priority", headerName: "Priority", width: 150 },
-  { field: "dueDate", headerName: "Due Date", width: 150 },
+  { 
+    field: "dueDate", 
+    headerName: "Due Date", 
+    width: 150,
+    valueFormatter: (params) => formatDate(params.value),
+  },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -37,22 +47,22 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const HomePage = () => {
   const { data: projects, isLoading: isProjectsLoading } = useGetProjectsQuery();
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-  const [fadeIn, setFadeIn] = useState(false); // ✅ Add fade-in state
+  const [fadeIn, setFadeIn] = useState(false); // State for fade-in effect
 
+  // Auto-switch projects every 10 seconds with fade-in effect
   useEffect(() => {
     if (!projects || projects.length === 0) return;
-  
+
     const interval = setInterval(() => {
-      setFadeIn(false); // Gradually remove fade-in effect
+      setFadeIn(false); // Reset fade-in before switching
       setTimeout(() => {
         setCurrentProjectIndex((prevIndex) => (prevIndex + 1) % projects.length);
-        setTimeout(() => setFadeIn(true), 300); // Delay fade-in slightly
-      }, 300); // Delay before switching projects
+        setFadeIn(true); // Trigger fade-in after switching
+      }, 100); // Small delay before switching
     }, 10000); // Change project every 10 seconds
-  
-    return () => clearInterval(interval);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [projects]);
-  
 
   const currentProject = projects?.[currentProjectIndex];
   const currentProjectId = currentProject?.id || 1; // Default to 1 if no projects
@@ -60,7 +70,7 @@ const HomePage = () => {
   const { data: tasks, isLoading: tasksLoading, isError: tasksError } =
     useGetTasksQuery({ projectId: currentProjectId });
 
-  const isDarkMode: boolean = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -80,13 +90,11 @@ const HomePage = () => {
     count: priorityCount[key],
   }));
 
-  // Count tasks by status (instead of project completion)
+  // Count tasks by status
   const taskStatusCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
       const { status } = task;
-      if (status) {
-        acc[status] = (acc[status] || 0) + 1;
-      }
+      if (status) acc[status] = (acc[status] || 0) + 1; // Ensure only valid statuses
       return acc;
     },
     {}
@@ -114,6 +122,13 @@ const HomePage = () => {
   return (
     <div className={`container h-full w-[100%] bg-gray-100 bg-transparent p-8 ${fadeIn ? "fade-in" : ""}`}>
       <Header name={`Project Management Dashboard - ${currentProject?.name || "Loading..."}`} />
+      
+      {/* Show Project Start & End Dates */}
+      <div className="mb-4 text-lg font-semibold dark:text-white">
+        <p>Start Date: {formatDate(currentProject?.startDate)}</p>
+        <p>End Date: {formatDate(currentProject?.endDate)}</p>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Task Priority Distribution Chart */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">

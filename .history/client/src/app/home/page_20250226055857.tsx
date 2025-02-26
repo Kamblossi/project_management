@@ -52,7 +52,7 @@ const HomePage = () => {
   
     return () => clearInterval(interval);
   }, [projects]);
-  
+\end{code}
 
   const currentProject = projects?.[currentProjectIndex];
   const currentProjectId = currentProject?.id || 1; // Default to 1 if no projects

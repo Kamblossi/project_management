@@ -2,6 +2,7 @@
 
 import {
   Priority,
+  Project,
   Task,
   useGetProjectsQuery,
   useGetTasksQuery,
@@ -25,11 +26,24 @@ import {
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 
+// ✅ Function to format dates properly (YYYY-MM-DD)
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "No Due Date";
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? "Invalid Date" : date.toISOString().split("T")[0];
+};
+
+// ✅ Updated Task Columns with Correct Date Formatting
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
   { field: "status", headerName: "Status", width: 150 },
   { field: "priority", headerName: "Priority", width: 150 },
-  { field: "dueDate", headerName: "Due Date", width: 150 },
+  {
+    field: "dueDate",
+    headerName: "Due Date",
+    width: 150,
+    valueFormatter: (params) => formatDate(params.value), // Format date correctly
+  },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -37,22 +51,17 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const HomePage = () => {
   const { data: projects, isLoading: isProjectsLoading } = useGetProjectsQuery();
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-  const [fadeIn, setFadeIn] = useState(false); // ✅ Add fade-in state
 
+  // Auto-switch projects every 10 seconds
   useEffect(() => {
     if (!projects || projects.length === 0) return;
-  
+
     const interval = setInterval(() => {
-      setFadeIn(false); // Gradually remove fade-in effect
-      setTimeout(() => {
-        setCurrentProjectIndex((prevIndex) => (prevIndex + 1) % projects.length);
-        setTimeout(() => setFadeIn(true), 300); // Delay fade-in slightly
-      }, 300); // Delay before switching projects
+      setCurrentProjectIndex((prevIndex) => (prevIndex + 1) % projects.length);
     }, 10000); // Change project every 10 seconds
-  
-    return () => clearInterval(interval);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [projects]);
-  
 
   const currentProject = projects?.[currentProjectIndex];
   const currentProjectId = currentProject?.id || 1; // Default to 1 if no projects
@@ -60,7 +69,7 @@ const HomePage = () => {
   const { data: tasks, isLoading: tasksLoading, isError: tasksError } =
     useGetTasksQuery({ projectId: currentProjectId });
 
-  const isDarkMode: boolean = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -84,9 +93,7 @@ const HomePage = () => {
   const taskStatusCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
       const { status } = task;
-      if (status) {
-        acc[status] = (acc[status] || 0) + 1;
-      }
+      acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
     {}
@@ -112,7 +119,7 @@ const HomePage = () => {
       };
 
   return (
-    <div className={`container h-full w-[100%] bg-gray-100 bg-transparent p-8 ${fadeIn ? "fade-in" : ""}`}>
+    <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
       <Header name={`Project Management Dashboard - ${currentProject?.name || "Loading..."}`} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Task Priority Distribution Chart */}
