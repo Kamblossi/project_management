@@ -145,5 +145,5 @@ export const {
   useSearchQuery,
   useGetTeamsQuery,
   useGetUsersQuery,
-  useGetTasksByUserQuery,
+  
 } = api;
