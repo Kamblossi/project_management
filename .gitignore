@@ -1,7 +1,10 @@
-client/node_modules
-server/node_modules
+# Ignore node_modules and build files
+client/node_modules/
+server/node_modules/
 client/dist/
 server/dist/
-server/.env
-client/.env
 client/.next/
+
+# Ignore all environment files (for security)
+**/.env
+**/.env.local
