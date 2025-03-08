@@ -4,7 +4,7 @@ server/node_modules/
 client/dist/
 server/dist/
 client/.next/
-node_modules
+
 
 # Ignore all environment files (for security)
 **/.env
