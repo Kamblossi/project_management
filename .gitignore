@@ -6,6 +6,5 @@ server/dist/
 client/.next/
 node_modules
 
-# Ignore all environment files (for security)
-**/.env
-**/.env.local
+.history/
+.DS_Store
